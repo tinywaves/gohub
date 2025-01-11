@@ -8,7 +8,7 @@ func InitWeb() *gin.Engine {
 	v1Server := server.Group("/v1")
 
 	userHandler := &UserHandler{}
-	userHandler.RegisterRoutes(v1Server)
+	userHandler.RegisterRoutes(v1Server.Group("/users"))
 
 	return server
 }
