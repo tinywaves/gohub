@@ -5,9 +5,9 @@ import "github.com/gin-gonic/gin"
 func InitWeb() *gin.Engine {
 	server := gin.Default()
 
-	v1Server := server.Group("/v1")
+	v1Server := server.Group("/v1/api")
 
-	userHandler := &UserHandler{}
+	userHandler := InitUsersHandler()
 	userHandler.RegisterRoutes(v1Server.Group("/users"))
 
 	return server
