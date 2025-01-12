@@ -46,7 +46,13 @@ func Init() *gin.Engine {
 	server.Use(sessions.Sessions("gohub-session", cookieStore))
 
 	// check sign in status
-	server.Use(middleware.InitAuthMiddlewareBuilder().Builder())
+	server.Use(
+		middleware.
+			InitAuthMiddlewareBuilder().
+			AppendIgnorePath("/v1/api/user/sign-in").
+			AppendIgnorePath("/v1/api/user/sign-up").
+			Builder(),
+	)
 
 	v1Server := server.Group("/v1/api")
 

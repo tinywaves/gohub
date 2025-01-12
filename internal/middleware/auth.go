@@ -8,17 +8,22 @@ import (
 	"slices"
 )
 
-var withoutAuth = []string{"/v1/api/user/sign-up", "/v1/api/user/sign-in"}
-
-type AuthMiddlewareBuilder struct{}
+type AuthMiddlewareBuilder struct {
+	ignorePaths []string
+}
 
 func InitAuthMiddlewareBuilder() *AuthMiddlewareBuilder {
 	return &AuthMiddlewareBuilder{}
 }
 
+func (amb *AuthMiddlewareBuilder) AppendIgnorePath(path string) *AuthMiddlewareBuilder {
+	amb.ignorePaths = append(amb.ignorePaths, path)
+	return amb
+}
+
 func (amb *AuthMiddlewareBuilder) Builder() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		if slices.Contains(withoutAuth, ctx.Request.URL.Path) {
+		if slices.Contains(amb.ignorePaths, ctx.Request.URL.Path) {
 			return
 		}
 		session := sessions.Default(ctx)
