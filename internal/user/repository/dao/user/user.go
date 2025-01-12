@@ -7,7 +7,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var ErrUserEmailDuplicated = errors.New("user with this email already exists")
+var (
+	ErrUserEmailDuplicated = errors.New("user with this email already exists")
+	ErrUserNotFound        = gorm.ErrRecordNotFound
+)
 
 type Dao struct {
 	database *gorm.DB
@@ -29,4 +32,10 @@ func (d *Dao) InsertUserRecord(ctx context.Context, e Entity) error {
 		}
 	}
 	return err
+}
+
+func (d *Dao) QueryUserByEmail(ctx context.Context, email string) (Entity, error) {
+	var e Entity
+	err := d.database.WithContext(ctx).Where("email = ?", email).First(&e).Error
+	return e, err
 }

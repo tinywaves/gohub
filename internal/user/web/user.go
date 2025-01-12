@@ -90,7 +90,40 @@ func (uh *UserHandler) SignUp(ctx *gin.Context) {
 	return
 }
 
-func (uh *UserHandler) SignIn(ctx *gin.Context) {}
+func (uh *UserHandler) SignIn(ctx *gin.Context) {
+	type Req struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	var req Req
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+
+	err := uh.userService.SignIn(
+		ctx,
+		domain.User{
+			Email:    req.Email,
+			Password: req.Password,
+		},
+	)
+	if err != nil {
+		if errors.Is(err, service.ErrUserNotFound) {
+			ctx.String(http.StatusOK, "your email is not registered")
+			return
+		}
+		if errors.Is(err, service.ErrUserEmailPasswordNotMatch) {
+			ctx.String(http.StatusOK, err.Error())
+			return
+		}
+		ctx.String(http.StatusOK, "system error")
+		return
+	}
+
+	ctx.String(http.StatusOK, "ok")
+	return
+}
 
 func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {}
 

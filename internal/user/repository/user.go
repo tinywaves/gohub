@@ -8,7 +8,10 @@ import (
 	"time"
 )
 
-var ErrUserEmailDuplicated = user.ErrUserEmailDuplicated
+var (
+	ErrUserEmailDuplicated = user.ErrUserEmailDuplicated
+	ErrUserNotFound        = user.ErrUserNotFound
+)
 
 type UserRepository struct {
 	userDao *user.Dao
@@ -22,7 +25,6 @@ func InitUserRepository(userDao *user.Dao) *UserRepository {
 
 func (ur *UserRepository) CreateUser(ctx context.Context, u domain.User) error {
 	now := time.Now().UnixMilli()
-
 	return ur.userDao.InsertUserRecord(
 		ctx,
 		user.Entity{
@@ -33,4 +35,12 @@ func (ur *UserRepository) CreateUser(ctx context.Context, u domain.User) error {
 			UpdateTime: now,
 		},
 	)
+}
+
+func (ur *UserRepository) FindUserByEmail(ctx context.Context, email string) (domain.User, error) {
+	entity, err := ur.userDao.QueryUserByEmail(ctx, email)
+	if err != nil {
+		return domain.User{}, err
+	}
+	return domain.User{Email: entity.Email, Password: entity.Password}, nil
 }
