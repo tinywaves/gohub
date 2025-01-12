@@ -3,6 +3,7 @@ package web
 import (
 	"errors"
 	regexp "github.com/dlclark/regexp2"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gohub/internal/user/domain"
 	"gohub/internal/user/service"
@@ -101,7 +102,7 @@ func (uh *UserHandler) SignIn(ctx *gin.Context) {
 		return
 	}
 
-	err := uh.userService.SignIn(
+	user, err := uh.userService.SignIn(
 		ctx,
 		domain.User{
 			Email:    req.Email,
@@ -117,6 +118,14 @@ func (uh *UserHandler) SignIn(ctx *gin.Context) {
 			ctx.String(http.StatusOK, err.Error())
 			return
 		}
+		ctx.String(http.StatusOK, "system error")
+		return
+	}
+
+	session := sessions.Default(ctx)
+	session.Set("gohub-user", user.Id)
+	err = session.Save()
+	if err != nil {
 		ctx.String(http.StatusOK, "system error")
 		return
 	}

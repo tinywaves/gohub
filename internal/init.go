@@ -2,7 +2,10 @@ package internal
 
 import (
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"gohub/internal/middleware"
 	"gohub/internal/user"
 	"gohub/internal/user/repository/dao"
 	"gorm.io/driver/mysql"
@@ -37,6 +40,13 @@ func Init() *gin.Engine {
 		},
 		MaxAge: 12 * time.Hour,
 	}))
+
+	// set session and cookie
+	cookieStore := cookie.NewStore([]byte("gohub-secret"))
+	server.Use(sessions.Sessions("gohub-session", cookieStore))
+
+	// check sign in status
+	server.Use(middleware.InitAuthMiddlewareBuilder().Builder())
 
 	v1Server := server.Group("/v1/api")
 
