@@ -3,10 +3,8 @@ package web
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"gohub/internal/repository"
 	"gohub/internal/repository/dao"
-	"gohub/internal/repository/dao/user"
-	"gohub/internal/service"
+	"gohub/internal/web/user"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"
@@ -42,11 +40,7 @@ func InitWeb() *gin.Engine {
 
 	v1Server := server.Group("/v1/api")
 
-	userDao := user.InitDao(database)
-	userRepository := repository.InitUserRepository(userDao)
-	userService := service.InitUserService(userRepository)
-	userHandler := InitUserHandler(userService)
-	userHandler.RegisterRoutes(v1Server.Group("/user"))
+	user.InitUserWeb(database, v1Server)
 
 	return server
 }

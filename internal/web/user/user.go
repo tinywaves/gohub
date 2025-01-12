@@ -1,4 +1,4 @@
-package web
+package user
 
 import (
 	regexp "github.com/dlclark/regexp2"
@@ -8,32 +8,32 @@ import (
 	"net/http"
 )
 
-type UserHandler struct {
+type Handler struct {
 	compiledEmailRegexp    *regexp.Regexp
 	compiledPasswordRegexp *regexp.Regexp
 	userService            *service.UserService
 }
 
-func InitUserHandler(userService *service.UserService) *UserHandler {
+func InitHandler(userService *service.UserService) *Handler {
 	const (
 		emailRegexpPattern    = `^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$`
 		passwordRegexpPattern = `^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$`
 	)
-	return &UserHandler{
+	return &Handler{
 		compiledEmailRegexp:    regexp.MustCompile(emailRegexpPattern, regexp.None),
 		compiledPasswordRegexp: regexp.MustCompile(passwordRegexpPattern, regexp.None),
 		userService:            userService,
 	}
 }
 
-func (uh *UserHandler) RegisterRoutes(server *gin.RouterGroup) {
+func (uh *Handler) RegisterRoutes(server *gin.RouterGroup) {
 	server.POST("/sign-up", uh.SignUp)
 	server.POST("/sign-in", uh.SignIn)
 	server.PATCH("/:id", uh.UpdateUserInfo)
 	server.GET("/:id", uh.GetUserInfo)
 }
 
-func (uh *UserHandler) SignUp(ctx *gin.Context) {
+func (uh *Handler) SignUp(ctx *gin.Context) {
 	type Req struct {
 		Email             string `json:"email"`
 		Password          string `json:"password"`
@@ -85,8 +85,8 @@ func (uh *UserHandler) SignUp(ctx *gin.Context) {
 	return
 }
 
-func (uh *UserHandler) SignIn(ctx *gin.Context) {}
+func (uh *Handler) SignIn(ctx *gin.Context) {}
 
-func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {}
+func (uh *Handler) UpdateUserInfo(ctx *gin.Context) {}
 
-func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {}
+func (uh *Handler) GetUserInfo(ctx *gin.Context) {}
