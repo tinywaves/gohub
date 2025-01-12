@@ -7,6 +7,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var ErrUserEmailDuplicated = repository.ErrUserEmailDuplicated
+
 type UserService struct {
 	userRepository *repository.UserRepository
 }

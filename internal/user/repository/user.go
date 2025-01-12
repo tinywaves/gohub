@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var ErrUserEmailDuplicated = user.ErrUserEmailDuplicated
+
 type UserRepository struct {
 	userDao *user.Dao
 }

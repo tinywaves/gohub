@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 	"gohub/internal/user/domain"
@@ -77,6 +78,10 @@ func (uh *UserHandler) SignUp(ctx *gin.Context) {
 		},
 	)
 	if err != nil {
+		if errors.Is(err, service.ErrUserEmailDuplicated) {
+			ctx.String(http.StatusOK, err.Error())
+			return
+		}
 		ctx.String(http.StatusOK, "system error")
 		return
 	}
