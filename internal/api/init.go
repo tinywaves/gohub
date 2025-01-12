@@ -1,13 +1,13 @@
-package internal
+package api
 
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"gohub/internal/api/user"
+	"gohub/internal/api/user/repository/dao"
 	"gohub/internal/middleware"
-	"gohub/internal/user"
-	"gohub/internal/user/repository/dao"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"

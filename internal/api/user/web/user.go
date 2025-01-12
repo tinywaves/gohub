@@ -5,8 +5,8 @@ import (
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"gohub/internal/user/domain"
-	"gohub/internal/user/service"
+	"gohub/internal/api/user/domain"
+	"gohub/internal/api/user/service"
 	"net/http"
 )
 

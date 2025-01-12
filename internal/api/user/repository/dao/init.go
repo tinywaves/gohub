@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"gohub/internal/user/repository/dao/user"
+	"gohub/internal/api/user/repository/dao/user"
 	"gorm.io/gorm"
 )
 

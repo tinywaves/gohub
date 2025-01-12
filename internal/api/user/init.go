@@ -2,10 +2,10 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"gohub/internal/user/repository"
-	"gohub/internal/user/repository/dao/user"
-	"gohub/internal/user/service"
-	"gohub/internal/user/web"
+	"gohub/internal/api/user/repository"
+	"gohub/internal/api/user/repository/dao/user"
+	"gohub/internal/api/user/service"
+	"gohub/internal/api/user/web"
 	"gorm.io/gorm"
 )
 

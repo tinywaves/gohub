@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"errors"
-	"gohub/internal/user/domain"
-	"gohub/internal/user/repository"
+	"gohub/internal/api/user/domain"
+	"gohub/internal/api/user/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
