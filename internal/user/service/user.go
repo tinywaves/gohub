@@ -4,6 +4,7 @@ import (
 	"context"
 	"gohub/internal/user/domain"
 	"gohub/internal/user/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
@@ -17,5 +18,10 @@ func InitUserService(userRepository *repository.UserRepository) *UserService {
 }
 
 func (us *UserService) SignUp(ctx context.Context, u domain.User) error {
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	u.Password = string(encryptedPassword)
 	return us.userRepository.CreateUser(ctx, u)
 }
