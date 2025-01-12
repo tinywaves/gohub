@@ -1,18 +1,20 @@
 package web
 
 import (
-	"fmt"
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
+	"gohub/internal/domain"
+	"gohub/internal/service"
 	"net/http"
 )
 
 type UserHandler struct {
 	compiledEmailRegexp    *regexp.Regexp
 	compiledPasswordRegexp *regexp.Regexp
+	userService            *service.UserService
 }
 
-func InitUserHandler() *UserHandler {
+func InitUserHandler(userService *service.UserService) *UserHandler {
 	const (
 		emailRegexpPattern    = `^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$`
 		passwordRegexpPattern = `^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$`
@@ -20,6 +22,7 @@ func InitUserHandler() *UserHandler {
 	return &UserHandler{
 		compiledEmailRegexp:    regexp.MustCompile(emailRegexpPattern, regexp.None),
 		compiledPasswordRegexp: regexp.MustCompile(passwordRegexpPattern, regexp.None),
+		userService:            userService,
 	}
 }
 
@@ -66,8 +69,20 @@ func (uh *UserHandler) SignUp(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println(req)
+	err = uh.userService.SignUp(
+		ctx.Request.Context(),
+		domain.User{
+			Email:    req.Email,
+			Password: req.Password,
+		},
+	)
+	if err != nil {
+		ctx.String(http.StatusOK, "system error")
+		return
+	}
+
 	ctx.String(http.StatusOK, "ok")
+	return
 }
 
 func (uh *UserHandler) SignIn(ctx *gin.Context) {}
