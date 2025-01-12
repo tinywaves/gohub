@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func InitWeb() *gin.Engine {
+func Init() *gin.Engine {
 	server := gin.Default()
 	database, err := gorm.Open(mysql.Open("root:root@tcp(localhost:13306)/gohub"))
 	if err != nil {
