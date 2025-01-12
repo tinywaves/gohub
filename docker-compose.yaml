@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:9.1.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./scripts/mysql/:/docker-entrypoint-initdb.d/
+    ports:
+      - "13306:3306"
