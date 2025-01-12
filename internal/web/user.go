@@ -7,30 +7,30 @@ import (
 	"net/http"
 )
 
-type UsersHandler struct {
+type UserHandler struct {
 	compiledEmailRegexp    *regexp.Regexp
 	compiledPasswordRegexp *regexp.Regexp
 }
 
-func InitUsersHandler() *UsersHandler {
+func InitUserHandler() *UserHandler {
 	const (
 		emailRegexpPattern    = `^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$`
 		passwordRegexpPattern = `^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$`
 	)
-	return &UsersHandler{
+	return &UserHandler{
 		compiledEmailRegexp:    regexp.MustCompile(emailRegexpPattern, regexp.None),
 		compiledPasswordRegexp: regexp.MustCompile(passwordRegexpPattern, regexp.None),
 	}
 }
 
-func (uh *UsersHandler) RegisterRoutes(server *gin.RouterGroup) {
+func (uh *UserHandler) RegisterRoutes(server *gin.RouterGroup) {
 	server.POST("/sign-up", uh.SignUp)
 	server.POST("/sign-in", uh.SignIn)
 	server.PATCH("/:id", uh.UpdateUserInfo)
 	server.GET("/:id", uh.GetUserInfo)
 }
 
-func (uh *UsersHandler) SignUp(ctx *gin.Context) {
+func (uh *UserHandler) SignUp(ctx *gin.Context) {
 	type Req struct {
 		Email             string `json:"email"`
 		Password          string `json:"password"`
@@ -70,8 +70,8 @@ func (uh *UsersHandler) SignUp(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "ok")
 }
 
-func (uh *UsersHandler) SignIn(ctx *gin.Context) {}
+func (uh *UserHandler) SignIn(ctx *gin.Context) {}
 
-func (uh *UsersHandler) UpdateUserInfo(ctx *gin.Context) {}
+func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {}
 
-func (uh *UsersHandler) GetUserInfo(ctx *gin.Context) {}
+func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {}

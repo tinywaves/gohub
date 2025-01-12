@@ -28,8 +28,8 @@ func InitWeb() *gin.Engine {
 
 	v1Server := server.Group("/v1/api")
 
-	userHandler := InitUsersHandler()
-	userHandler.RegisterRoutes(v1Server.Group("/users"))
+	userHandler := InitUserHandler()
+	userHandler.RegisterRoutes(v1Server.Group("/user"))
 
 	return server
 }
