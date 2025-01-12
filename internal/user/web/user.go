@@ -1,39 +1,39 @@
-package user
+package web
 
 import (
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
-	"gohub/internal/domain"
-	"gohub/internal/service"
+	"gohub/internal/user/domain"
+	"gohub/internal/user/service"
 	"net/http"
 )
 
-type Handler struct {
+type UserHandler struct {
 	compiledEmailRegexp    *regexp.Regexp
 	compiledPasswordRegexp *regexp.Regexp
 	userService            *service.UserService
 }
 
-func InitHandler(userService *service.UserService) *Handler {
+func InitUserHandler(userService *service.UserService) *UserHandler {
 	const (
 		emailRegexpPattern    = `^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$`
 		passwordRegexpPattern = `^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$`
 	)
-	return &Handler{
+	return &UserHandler{
 		compiledEmailRegexp:    regexp.MustCompile(emailRegexpPattern, regexp.None),
 		compiledPasswordRegexp: regexp.MustCompile(passwordRegexpPattern, regexp.None),
 		userService:            userService,
 	}
 }
 
-func (uh *Handler) RegisterRoutes(server *gin.RouterGroup) {
+func (uh *UserHandler) RegisterRoutes(server *gin.RouterGroup) {
 	server.POST("/sign-up", uh.SignUp)
 	server.POST("/sign-in", uh.SignIn)
 	server.PATCH("/:id", uh.UpdateUserInfo)
 	server.GET("/:id", uh.GetUserInfo)
 }
 
-func (uh *Handler) SignUp(ctx *gin.Context) {
+func (uh *UserHandler) SignUp(ctx *gin.Context) {
 	type Req struct {
 		Email             string `json:"email"`
 		Password          string `json:"password"`
@@ -85,8 +85,8 @@ func (uh *Handler) SignUp(ctx *gin.Context) {
 	return
 }
 
-func (uh *Handler) SignIn(ctx *gin.Context) {}
+func (uh *UserHandler) SignIn(ctx *gin.Context) {}
 
-func (uh *Handler) UpdateUserInfo(ctx *gin.Context) {}
+func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {}
 
-func (uh *Handler) GetUserInfo(ctx *gin.Context) {}
+func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {}

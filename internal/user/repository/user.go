@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 	"github.com/google/uuid"
-	"gohub/internal/domain"
-	"gohub/internal/repository/dao/user"
+	"gohub/internal/user/domain"
+	"gohub/internal/user/repository/dao/user"
 	"time"
 )
 

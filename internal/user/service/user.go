@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"gohub/internal/domain"
-	"gohub/internal/repository"
+	"gohub/internal/user/domain"
+	"gohub/internal/user/repository"
 )
 
 type UserService struct {

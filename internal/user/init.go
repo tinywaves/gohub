@@ -2,16 +2,17 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"gohub/internal/repository"
-	"gohub/internal/repository/dao/user"
-	"gohub/internal/service"
+	"gohub/internal/user/repository"
+	"gohub/internal/user/repository/dao/user"
+	"gohub/internal/user/service"
+	"gohub/internal/user/web"
 	"gorm.io/gorm"
 )
 
-func InitUserWeb(database *gorm.DB, v1Server *gin.RouterGroup) {
+func Init(database *gorm.DB, v1Server *gin.RouterGroup) {
 	userDao := user.InitDao(database)
 	userRepository := repository.InitUserRepository(userDao)
 	userService := service.InitUserService(userRepository)
-	userHandler := InitHandler(userService)
+	userHandler := web.InitUserHandler(userService)
 	userHandler.RegisterRoutes(v1Server.Group("/user"))
 }

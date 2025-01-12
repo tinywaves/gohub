@@ -1,9 +1,9 @@
 package main
 
-import "gohub/internal/web"
+import "gohub/internal"
 
 func main() {
-	server := web.InitWeb()
+	server := internal.InitWeb()
 	err := server.Run(":8080")
 	if err != nil {
 		return

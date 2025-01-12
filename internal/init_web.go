@@ -1,10 +1,10 @@
-package web
+package internal
 
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"gohub/internal/repository/dao"
-	"gohub/internal/web/user"
+	"gohub/internal/user"
+	"gohub/internal/user/repository/dao"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"
@@ -40,7 +40,7 @@ func InitWeb() *gin.Engine {
 
 	v1Server := server.Group("/v1/api")
 
-	user.InitUserWeb(database, v1Server)
+	user.Init(database, v1Server)
 
 	return server
 }
