@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -32,7 +31,6 @@ func (amb *AuthMiddlewareBuilder) Builder() gin.HandlerFunc {
 			return
 		}
 		sessionUser := session.Get("gohub-user")
-		fmt.Println(sessionUser)
 		if sessionUser == nil {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return

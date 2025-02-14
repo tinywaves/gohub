@@ -134,6 +134,46 @@ func (uh *UserHandler) SignIn(ctx *gin.Context) {
 	return
 }
 
-func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {}
+func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {
+	type Req struct {
+		Nickname string `json:"nickname"`
+		Bio      string `json:"bio"`
+		Birthday int64  `json:"birthday"`
+		Gender   string `json:"gender"`
+	}
+
+	var req Req
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+
+	userId := ctx.Param("id")
+	if userId == "" {
+		ctx.String(http.StatusOK, "please provide a specific user id")
+		return
+	}
+
+	err := uh.userService.UpdateUserInfo(
+		ctx,
+		domain.User{
+			Id:       userId,
+			Nickname: req.Nickname,
+			Bio:      req.Bio,
+			Birthday: req.Birthday,
+			Gender:   req.Gender,
+		},
+	)
+	if err != nil {
+		if errors.Is(err, service.ErrUserNotFound) {
+			ctx.String(http.StatusOK, "your email is not registered")
+			return
+		}
+		ctx.String(http.StatusOK, "system error")
+		return
+	}
+
+	ctx.String(http.StatusOK, "ok")
+	return
+}
 
 func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {}

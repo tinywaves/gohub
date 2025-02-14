@@ -44,3 +44,11 @@ func (us *UserService) SignIn(ctx context.Context, u domain.User) (domain.User, 
 	}
 	return foundUser, nil
 }
+
+func (us *UserService) UpdateUserInfo(ctx context.Context, u domain.User) error {
+	err := us.userRepository.FindUserById(ctx, u.Id)
+	if err != nil {
+		return err
+	}
+	return us.userRepository.UpdateUserInfoById(ctx, u)
+}
