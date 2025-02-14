@@ -40,9 +40,10 @@ func (d *Dao) QueryUserByEmail(ctx context.Context, email string) (Entity, error
 	return e, err
 }
 
-func (d *Dao) QueryUserById(ctx context.Context, id string) error {
-	err := d.database.WithContext(ctx).Where("id = ?", id).First(&Entity{}).Error
-	return err
+func (d *Dao) QueryUserById(ctx context.Context, id string) (Entity, error) {
+	var e Entity
+	err := d.database.WithContext(ctx).Where("id = ?", id).First(&e).Error
+	return e, err
 }
 
 func (d *Dao) ModifyUserById(ctx context.Context, id string, e Entity) error {

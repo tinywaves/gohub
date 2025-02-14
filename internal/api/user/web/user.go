@@ -165,7 +165,7 @@ func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {
 	)
 	if err != nil {
 		if errors.Is(err, service.ErrUserNotFound) {
-			ctx.String(http.StatusOK, "your email is not registered")
+			ctx.String(http.StatusOK, "your account is not registered")
 			return
 		}
 		ctx.String(http.StatusOK, "system error")
@@ -176,4 +176,23 @@ func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {
 	return
 }
 
-func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {}
+func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {
+	userId := ctx.Param("id")
+	if userId == "" {
+		ctx.String(http.StatusOK, "please provide a specific user id")
+		return
+	}
+
+	user, err := uh.userService.GetUserInfo(ctx, userId)
+	if err != nil {
+		if errors.Is(err, service.ErrUserNotFound) {
+			ctx.String(http.StatusOK, "your account is not registered")
+			return
+		}
+		ctx.String(http.StatusOK, "system error")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, user)
+	return
+}
