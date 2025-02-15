@@ -5,6 +5,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"gohub/internal"
 	"gohub/internal/api/user"
 	"gohub/internal/api/user/repository/dao"
 	"gohub/internal/middleware"
@@ -16,7 +17,7 @@ import (
 
 func Init() *gin.Engine {
 	server := gin.Default()
-	database, err := gorm.Open(mysql.Open("root:root@tcp(localhost:13306)/gohub"))
+	database, err := gorm.Open(mysql.Open(internal.MysqlDsn))
 	if err != nil {
 		panic(err)
 	}
@@ -33,17 +34,20 @@ func Init() *gin.Engine {
 		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 		AllowHeaders: []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
 		AllowOriginFunc: func(origin string) bool {
-			if strings.HasPrefix(origin, "http://localhost") {
+			if strings.HasPrefix(origin, internal.DevUrl) {
 				return true
 			}
-			return strings.Contains(origin, "https://gohub.com")
+			return strings.Contains(origin, internal.ProdUrl)
 		},
 		MaxAge: 12 * time.Hour,
 	}))
 
 	// set session and cookie
-	cookieStore := cookie.NewStore([]byte("gohub-secret"))
-	server.Use(sessions.Sessions("gohub-session", cookieStore))
+	cookieStore := cookie.NewStore(
+		[]byte(internal.AuthenticationKey),
+		[]byte(internal.EncryptionKey),
+	)
+	server.Use(sessions.Sessions(internal.SessionStoreName, cookieStore))
 
 	// check sign in status
 	server.Use(

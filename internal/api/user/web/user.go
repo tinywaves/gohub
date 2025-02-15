@@ -5,6 +5,7 @@ import (
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"gohub/internal"
 	"gohub/internal/api/user/domain"
 	"gohub/internal/api/user/service"
 	"net/http"
@@ -103,7 +104,7 @@ func (uh *UserHandler) SignIn(ctx *gin.Context) {
 	}
 
 	user, err := uh.userService.SignIn(
-		ctx,
+		ctx.Request.Context(),
 		domain.User{
 			Email:    req.Email,
 			Password: req.Password,
@@ -123,7 +124,7 @@ func (uh *UserHandler) SignIn(ctx *gin.Context) {
 	}
 
 	session := sessions.Default(ctx)
-	session.Set("gohub-user", user.Id)
+	session.Set(internal.SessionDataKey, user.Id)
 	err = session.Save()
 	if err != nil {
 		ctx.String(http.StatusOK, "system error")
@@ -154,7 +155,7 @@ func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {
 	}
 
 	err := uh.userService.UpdateUserInfo(
-		ctx,
+		ctx.Request.Context(),
 		domain.User{
 			Id:       userId,
 			Nickname: req.Nickname,
@@ -183,7 +184,7 @@ func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	user, err := uh.userService.GetUserInfo(ctx, userId)
+	user, err := uh.userService.GetUserInfo(ctx.Request.Context(), userId)
 	if err != nil {
 		if errors.Is(err, service.ErrUserNotFound) {
 			ctx.String(http.StatusOK, "your account is not registered")

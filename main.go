@@ -1,10 +1,13 @@
 package main
 
-import "gohub/internal/api"
+import (
+	"gohub/internal"
+	"gohub/internal/api"
+)
 
 func main() {
 	server := api.Init()
-	err := server.Run(":8080")
+	err := server.Run(":" + string(rune(internal.Port)))
 	if err != nil {
 		return
 	}
