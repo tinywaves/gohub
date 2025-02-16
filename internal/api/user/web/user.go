@@ -126,6 +126,9 @@ func (uh *UserHandler) SignIn(ctx *gin.Context) {
 
 	session := sessions.Default(ctx)
 	session.Set(internal.SessionDataKey, user.Id)
+	session.Options(sessions.Options{
+		MaxAge: internal.SessionLastRefreshInterval,
+	})
 	err = session.Save()
 	if err != nil {
 		ctx.String(http.StatusOK, "system error")

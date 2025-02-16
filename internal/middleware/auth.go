@@ -6,6 +6,7 @@ import (
 	"gohub/internal"
 	"net/http"
 	"slices"
+	"time"
 )
 
 type AuthMiddlewareBuilder struct {
@@ -35,6 +36,45 @@ func (amb *AuthMiddlewareBuilder) Builder() gin.HandlerFunc {
 		if sessionUser == nil {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
+		}
+
+		sessionLastRefresh := session.Get(internal.SessionLastRefreshKey)
+		now := time.Now().UnixMilli()
+		if sessionLastRefresh == nil {
+			session.Set(internal.SessionLastRefreshKey, now)
+			session.Set(internal.SessionDataKey, sessionUser)
+			session.Options(sessions.Options{
+				MaxAge: 60,
+			})
+			err := session.Save()
+			if err != nil {
+				ctx.AbortWithStatus(http.StatusInternalServerError)
+				return
+			} else {
+				return
+			}
+		} else {
+			sessionLastRefreshVal, ok := sessionLastRefresh.(int64)
+			if !ok {
+				ctx.AbortWithStatus(http.StatusInternalServerError)
+				return
+			}
+			if now-sessionLastRefreshVal > internal.SessionLastRefreshInterval*1000 {
+				session.Set(internal.SessionLastRefreshKey, now)
+				session.Set(internal.SessionDataKey, sessionUser)
+				session.Options(sessions.Options{
+					MaxAge: 60,
+				})
+				err := session.Save()
+				if err != nil {
+					ctx.AbortWithStatus(http.StatusInternalServerError)
+					return
+				} else {
+					return
+				}
+			} else {
+				return
+			}
 		}
 	}
 }
