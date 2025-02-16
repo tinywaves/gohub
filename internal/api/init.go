@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"gohub/internal"
 	"gohub/internal/api/user"
@@ -42,12 +42,19 @@ func Init() *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	// set session and cookie
-	cookieStore := cookie.NewStore(
+	// set session and store
+	redisStore, redisError := redis.NewStore(
+		internal.RedisSize,
+		internal.RedisNetwork,
+		internal.RedisAddress,
+		internal.RedisPassword,
 		[]byte(internal.AuthenticationKey),
 		[]byte(internal.EncryptionKey),
 	)
-	server.Use(sessions.Sessions(internal.SessionStoreName, cookieStore))
+	if redisError != nil {
+		panic(redisError)
+	}
+	server.Use(sessions.Sessions(internal.SessionStoreName, redisStore))
 
 	// check sign in status
 	server.Use(

@@ -32,8 +32,9 @@ func InitUserHandler(userService *service.UserService) *UserHandler {
 func (uh *UserHandler) RegisterRoutes(server *gin.RouterGroup) {
 	server.POST("/sign-up", uh.SignUp)
 	server.POST("/sign-in", uh.SignIn)
-	server.PATCH("/:id", uh.UpdateUserInfo)
-	server.GET("/:id", uh.GetUserInfo)
+	server.PATCH("", uh.UpdateUserInfo)
+	server.GET("", uh.GetUserInfo)
+	server.POST("/sign-out", uh.SignOut)
 }
 
 func (uh *UserHandler) SignUp(ctx *gin.Context) {
@@ -148,11 +149,8 @@ func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	userId := ctx.Param("id")
-	if userId == "" {
-		ctx.String(http.StatusOK, "please provide a specific user id")
-		return
-	}
+	session := sessions.Default(ctx)
+	userId := session.Get(internal.SessionDataKey).(string)
 
 	err := uh.userService.UpdateUserInfo(
 		ctx.Request.Context(),
@@ -178,11 +176,8 @@ func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {
 }
 
 func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {
-	userId := ctx.Param("id")
-	if userId == "" {
-		ctx.String(http.StatusOK, "please provide a specific user id")
-		return
-	}
+	session := sessions.Default(ctx)
+	userId := session.Get(internal.SessionDataKey).(string)
 
 	user, err := uh.userService.GetUserInfo(ctx.Request.Context(), userId)
 	if err != nil {
@@ -195,5 +190,18 @@ func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, user)
+	return
+}
+
+func (uh *UserHandler) SignOut(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	session.Clear()
+	err := session.Save()
+	if err != nil {
+		ctx.String(http.StatusOK, "system error")
+		return
+	}
+
+	ctx.String(http.StatusOK, "ok")
 	return
 }

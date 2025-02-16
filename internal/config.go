@@ -6,7 +6,11 @@ const (
 	MysqlDsn          = "root:root@tcp(localhost:13306)/gohub"
 	DevUrl            = "http://localhost"
 	ProdUrl           = "https://gohub.com"
-	AuthenticationKey = "os5SXpAOPZCCid5seHnUx10xOHHZnVSQQ53btZKNKUOjYaqt3U3zEPIS7zXngMp8"
-	EncryptionKey     = "ArasYlndMqAOm7vf1skQQZjeIJ5DBffWuOisKwvtaNkh9Oh67FKDSgmHS15mNV3h"
+	AuthenticationKey = "f2N07VpRqXpOdzWySWdz9LRlmQlqLMkv"
+	EncryptionKey     = "C8fB0Ryk2BGQcJ08TqtKObw7AEhVIjB1"
 	SessionStoreName  = "gohub-session"
+	RedisSize         = 16
+	RedisNetwork      = "tcp"
+	RedisAddress      = "localhost:16379"
+	RedisPassword     = ""
 )
