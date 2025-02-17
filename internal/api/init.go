@@ -3,10 +3,12 @@ package api
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"gohub/internal"
 	"gohub/internal/api/user"
 	"gohub/internal/api/user/repository/dao"
 	"gohub/internal/middleware"
+	"gohub/package/middleware/ratelimit"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"
@@ -27,6 +29,21 @@ func Init() *gin.Engine {
 	if err != nil {
 		panic(err)
 	}
+
+	// redis
+	redisClient := redis.NewClient(&redis.Options{Addr: internal.RedisAddr})
+
+	// ratelimit
+	server.Use(
+		ratelimit.
+			InitRatelimitMiddlewareBuilder(
+				internal.RateLimitPrefix,
+				redisClient,
+				internal.RateLimitInterval,
+				internal.RateLimitRate,
+			).
+			Build(),
+	)
 
 	// cors
 	server.Use(cors.New(cors.Config{
