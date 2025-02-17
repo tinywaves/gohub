@@ -125,7 +125,10 @@ func (uh *UserHandler) SignIn(ctx *gin.Context) {
 
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodRS256,
-		UserClaims{Uid: user.Id},
+		UserClaims{
+			Uid:       user.Id,
+			UserAgent: ctx.Request.UserAgent(),
+		},
 	)
 	signedString, signedStringErr := token.SignedString(internal.PrivateKey)
 	if signedStringErr != nil {

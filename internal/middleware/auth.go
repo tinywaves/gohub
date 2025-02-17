@@ -45,6 +45,10 @@ func (amb *AuthMiddlewareBuilder) Builder() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
+		if userClaims.UserAgent != ctx.Request.UserAgent() {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 
 		ctx.Set(internal.CtxUserIdKey, userClaims.Uid)
 		return
