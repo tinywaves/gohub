@@ -5,6 +5,7 @@ import (
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"gohub/internal"
 	"gohub/internal/api/user/domain"
 	"gohub/internal/api/user/service"
@@ -124,16 +125,18 @@ func (uh *UserHandler) SignIn(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	session.Set(internal.SessionDataKey, user.Id)
-	session.Options(sessions.Options{
-		MaxAge: internal.SessionLastRefreshInterval,
-	})
-	err = session.Save()
-	if err != nil {
+	token := jwt.NewWithClaims(
+		jwt.SigningMethodRS256,
+		jwt.MapClaims{
+			"userId": user.Id,
+		},
+	)
+	signedString, signedStringErr := token.SignedString(internal.PrivateKey)
+	if signedStringErr != nil {
 		ctx.String(http.StatusOK, "system error")
 		return
 	}
+	ctx.Header(internal.JwtTokenHeaderKey, signedString)
 
 	ctx.String(http.StatusOK, "ok")
 	return

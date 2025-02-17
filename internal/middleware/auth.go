@@ -1,12 +1,11 @@
 package middleware
 
 import (
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"gohub/internal"
 	"net/http"
 	"slices"
-	"time"
 )
 
 type AuthMiddlewareBuilder struct {
@@ -27,54 +26,20 @@ func (amb *AuthMiddlewareBuilder) Builder() gin.HandlerFunc {
 		if slices.Contains(amb.ignorePaths, ctx.Request.URL.Path) {
 			return
 		}
-		session := sessions.Default(ctx)
-		if session == nil {
+
+		receivedToken := ctx.GetHeader(internal.JwtTokenHeaderKey)
+		if receivedToken == "" {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		sessionUser := session.Get(internal.SessionDataKey)
-		if sessionUser == nil {
+		token, err := jwt.Parse(receivedToken, func(token *jwt.Token) (interface{}, error) {
+			return internal.PrivateKey.PublicKey, nil
+		})
+		if err != nil || token == nil || !token.Valid {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
-		sessionLastRefresh := session.Get(internal.SessionLastRefreshKey)
-		now := time.Now().UnixMilli()
-		if sessionLastRefresh == nil {
-			session.Set(internal.SessionLastRefreshKey, now)
-			session.Set(internal.SessionDataKey, sessionUser)
-			session.Options(sessions.Options{
-				MaxAge: 60,
-			})
-			err := session.Save()
-			if err != nil {
-				ctx.AbortWithStatus(http.StatusInternalServerError)
-				return
-			} else {
-				return
-			}
-		} else {
-			sessionLastRefreshVal, ok := sessionLastRefresh.(int64)
-			if !ok {
-				ctx.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			if now-sessionLastRefreshVal > internal.SessionLastRefreshInterval*1000 {
-				session.Set(internal.SessionLastRefreshKey, now)
-				session.Set(internal.SessionDataKey, sessionUser)
-				session.Options(sessions.Options{
-					MaxAge: 60,
-				})
-				err := session.Save()
-				if err != nil {
-					ctx.AbortWithStatus(http.StatusInternalServerError)
-					return
-				} else {
-					return
-				}
-			} else {
-				return
-			}
-		}
+		return
 	}
 }

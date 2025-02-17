@@ -2,8 +2,6 @@ package api
 
 import (
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"gohub/internal"
 	"gohub/internal/api/user"
@@ -16,6 +14,10 @@ import (
 )
 
 func Init() *gin.Engine {
+	// privateKey is used to sign and verify the JWT token
+	internal.GeneratePrivateKey()
+
+	// gin server
 	server := gin.Default()
 	database, err := gorm.Open(mysql.Open(internal.MysqlDsn))
 	if err != nil {
@@ -31,8 +33,9 @@ func Init() *gin.Engine {
 		AllowCredentials: true,
 		// AllowAllOrigins:  true,
 		// AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
-		AllowHeaders: []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowMethods:  []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:  []string{"Origin", "Content-Length", "Content-Type", internal.JwtTokenHeaderKey},
+		ExposeHeaders: []string{internal.JwtTokenHeaderKey},
 		AllowOriginFunc: func(origin string) bool {
 			if strings.HasPrefix(origin, internal.DevUrl) {
 				return true
@@ -41,20 +44,6 @@ func Init() *gin.Engine {
 		},
 		MaxAge: 12 * time.Hour,
 	}))
-
-	// set session and store
-	redisStore, redisError := redis.NewStore(
-		internal.RedisSize,
-		internal.RedisNetwork,
-		internal.RedisAddress,
-		internal.RedisPassword,
-		[]byte(internal.AuthenticationKey),
-		[]byte(internal.EncryptionKey),
-	)
-	if redisError != nil {
-		panic(redisError)
-	}
-	server.Use(sessions.Sessions(internal.SessionStoreName, redisStore))
 
 	// check sign in status
 	server.Use(
