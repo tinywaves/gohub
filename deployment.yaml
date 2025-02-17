@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $title$
+  labels:
+    app: $title$
+spec:
+  replicas: $1$
+  selector:
+    matchLabels:
+      app: $title$
+  template:
+    metadata:
+      name: $title$
+      labels:
+        app: $title$
+    spec:
+      containers:
+        - name: $title$
+          image: $nginx$
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: $80$
+              protocol: $TCP$
+      restartPolicy: Always
+      $END$
