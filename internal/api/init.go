@@ -14,8 +14,8 @@ import (
 )
 
 func Init() *gin.Engine {
-	// privateKey is used to sign and verify the JWT token
-	internal.GeneratePrivateKey()
+	// load jwt keys
+	internal.LoadJwtKeys()
 
 	// gin server
 	server := gin.Default()

@@ -3,7 +3,6 @@ package web
 import (
 	"errors"
 	regexp "github.com/dlclark/regexp2"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"gohub/internal"
@@ -35,7 +34,6 @@ func (uh *UserHandler) RegisterRoutes(server *gin.RouterGroup) {
 	server.POST("/sign-in", uh.SignIn)
 	server.PATCH("", uh.UpdateUserInfo)
 	server.GET("", uh.GetUserInfo)
-	server.POST("/sign-out", uh.SignOut)
 }
 
 func (uh *UserHandler) SignUp(ctx *gin.Context) {
@@ -127,9 +125,7 @@ func (uh *UserHandler) SignIn(ctx *gin.Context) {
 
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodRS256,
-		jwt.MapClaims{
-			"userId": user.Id,
-		},
+		UserClaims{Uid: user.Id},
 	)
 	signedString, signedStringErr := token.SignedString(internal.PrivateKey)
 	if signedStringErr != nil {
@@ -155,8 +151,12 @@ func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	userId := session.Get(internal.SessionDataKey).(string)
+	customCtxUserId, _ := ctx.Get(internal.CtxUserIdKey)
+	userId, ok := customCtxUserId.(string)
+	if !ok {
+		ctx.String(http.StatusOK, "system error")
+		return
+	}
 
 	err := uh.userService.UpdateUserInfo(
 		ctx.Request.Context(),
@@ -182,8 +182,12 @@ func (uh *UserHandler) UpdateUserInfo(ctx *gin.Context) {
 }
 
 func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {
-	session := sessions.Default(ctx)
-	userId := session.Get(internal.SessionDataKey).(string)
+	customCtxUserId, _ := ctx.Get(internal.CtxUserIdKey)
+	userId, ok := customCtxUserId.(string)
+	if !ok {
+		ctx.String(http.StatusOK, "system error")
+		return
+	}
 
 	user, err := uh.userService.GetUserInfo(ctx.Request.Context(), userId)
 	if err != nil {
@@ -196,18 +200,5 @@ func (uh *UserHandler) GetUserInfo(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, user)
-	return
-}
-
-func (uh *UserHandler) SignOut(ctx *gin.Context) {
-	session := sessions.Default(ctx)
-	session.Clear()
-	err := session.Save()
-	if err != nil {
-		ctx.String(http.StatusOK, "system error")
-		return
-	}
-
-	ctx.String(http.StatusOK, "ok")
 	return
 }
