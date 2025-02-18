@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gohub
+  labels:
+    app: gohub
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gohub
+  template:
+    metadata:
+      name: gohub
+      labels:
+        app: gohub
+    spec:
+      containers:
+        - name: gohub
+          image: tinywaves/gohub:latest
