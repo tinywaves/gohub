@@ -3,14 +3,15 @@ package ratelimit
 import (
 	_ "embed"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
-type MiddlewareBuilder struct {
+type ratelimitMiddlewareBuilder struct {
 	prefix   string
 	cmd      redis.Cmdable
 	interval time.Duration
@@ -25,8 +26,8 @@ func InitRatelimitMiddlewareBuilder(
 	cmd redis.Cmdable,
 	interval time.Duration,
 	rate int,
-) *MiddlewareBuilder {
-	return &MiddlewareBuilder{
+) *ratelimitMiddlewareBuilder {
+	return &ratelimitMiddlewareBuilder{
 		prefix:   prefix,
 		cmd:      cmd,
 		interval: interval,
@@ -34,9 +35,26 @@ func InitRatelimitMiddlewareBuilder(
 	}
 }
 
-func (m *MiddlewareBuilder) Build() gin.HandlerFunc {
+func (rmb *ratelimitMiddlewareBuilder) limit(ctx *gin.Context) (bool, error) {
+	key := fmt.Sprintf("%s:%s", rmb.prefix, ctx.ClientIP())
+	return rmb.cmd.Eval(
+		ctx,
+		luaScript,
+		[]string{key},
+		rmb.interval.Milliseconds(),
+		rmb.rate,
+		time.Now().UnixMilli(),
+	).Bool()
+}
+
+func (rmb *ratelimitMiddlewareBuilder) Prefix(prefix string) *ratelimitMiddlewareBuilder {
+	rmb.prefix = prefix
+	return rmb
+}
+
+func (rmb *ratelimitMiddlewareBuilder) Build() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		limited, err := m.limit(ctx)
+		limited, err := rmb.limit(ctx)
 		if err != nil {
 			log.Println(err)
 			ctx.AbortWithStatus(http.StatusInternalServerError)
@@ -49,21 +67,4 @@ func (m *MiddlewareBuilder) Build() gin.HandlerFunc {
 		}
 		ctx.Next()
 	}
-}
-
-func (m *MiddlewareBuilder) limit(ctx *gin.Context) (bool, error) {
-	key := fmt.Sprintf("%s:%s", m.prefix, ctx.ClientIP())
-	return m.cmd.Eval(
-		ctx,
-		luaScript,
-		[]string{key},
-		m.interval.Milliseconds(),
-		m.rate,
-		time.Now().UnixMilli(),
-	).Bool()
-}
-
-func (m *MiddlewareBuilder) Prefix(prefix string) *MiddlewareBuilder {
-	m.prefix = prefix
-	return m
 }

@@ -4,6 +4,7 @@
 .PHONY: docker docker-major docker-minor docker-patch
 
 VERSION := $(shell cat VERSION)
+BUILD_POSITION := build/gohub
 DOCKER_REPO := tinywaves/gohub
 
 help:
@@ -42,11 +43,11 @@ show-version:
 
 build:
 	@echo "Building Docker image..."
-	@rm -f gohub || true
-	@GOOS=linux GOARCH=arm go build -o gohub .
+	@rm -f $(BUILD_POSITION) || true
+	@GOOS=linux GOARCH=arm go build -o $(BUILD_POSITION) .
 	@docker build -t $(DOCKER_REPO):$(shell cat VERSION) .
 	@docker tag $(DOCKER_REPO):$(shell cat VERSION) $(DOCKER_REPO):latest
-	@rm -f gohub || true
+	@rm -f $(BUILD_POSITION) || true
 
 push:
 	@echo "Pushing Docker image to Docker Hub..."

@@ -1,4 +1,4 @@
-.vscode
-.idea
 .DS_Store
-*.pem
+pem/*.pem
+__debug*
+build

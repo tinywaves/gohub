@@ -1,11 +1,11 @@
 package domain
 
 type User struct {
-	Id       string
+	UserId   string
 	Email    string
 	Password string
 	Nickname string
 	Bio      string
-	Gender   string
-	Birthday int64
+	Gender   int // 0 - male, 1 - female
+	Birthday int
 }

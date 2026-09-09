@@ -1,5 +1,5 @@
-FROM ubuntu:latest
+FROM ubuntu:24.04
 LABEL name="gohub" author="Lyle Zheng"
-COPY gohub /app/gohub
+COPY build/gohub /app/gohub
 WORKDIR /app
 ENTRYPOINT ["/app/gohub"]

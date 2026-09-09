@@ -1,7 +1,9 @@
 # gohub
 
-A community universal server implemented using go.
+## Prepare
 
-## Todo
+### Generate jwt key pair
 
-- [ ] Token refresh
+```bash
+go run pem/main.go
+```

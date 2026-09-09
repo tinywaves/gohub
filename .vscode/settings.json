@@ -1,0 +1,48 @@
+{
+  "cSpell.words": [
+    "bidichk",
+    "Cmdable",
+    "dlclark",
+    "errchkjson",
+    "GOARCH",
+    "gocheckcompilerdirectives",
+    "gocritic",
+    "gofumpt",
+    "gohub",
+    "goimports",
+    "gonic",
+    "goprintffuncname",
+    "gorm",
+    "gosec",
+    "govet",
+    "milli",
+    "noctx",
+    "nolintlint",
+    "perfsprint",
+    "PEXPIRE",
+    "recvcheck",
+    "thelper",
+    "tparallel",
+    "unconvert",
+    "unparam",
+    "ZADD",
+    "ZCOUNT",
+    "ZREMRANGEBYSCORE"
+  ],
+  "[go]": {
+    "editor.defaultFormatter": "golang.go",
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "go.formatTool": "custom",
+  "go.alternateTools": {
+    "customFormatter": "golangci-lint"
+  },
+  "go.formatFlags": ["fmt", "--stdin"],
+  "go.lintTool": "golangci-lint",
+  "go.lintOnSave": "package",
+  "go.lintFlags": ["--path-mode=abs"]
+}

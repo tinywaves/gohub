@@ -1,20 +1,24 @@
-version: '3.1'
-
 services:
   mysql:
+    image: mysql:9.7.2
     container_name: mysql
-    image: mysql:9.1.0
-    restart: no
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
+    ports:
+      - '13306:3306'
     volumes:
-      - ./scripts/mysql/:/docker-entrypoint-initdb.d/
-    ports:
-      - "13306:3306"
+      - mysql-data:/var/lib/mysql
+      - ./script/mysql:/docker-entrypoint-initdb.d:ro
   redis:
+    image: redis:8.10.1
     container_name: redis
-    image: bitnami/redis:latest
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+    restart: unless-stopped
     ports:
-      - "16379:6379"
+      - '16379:6379'
+    volumes:
+      - redis-data:/data
+
+volumes:
+  mysql-data:
+  redis-data:
