@@ -11,7 +11,7 @@ const (
 	MysqlDsn = "root:root@tcp(localhost:13306)/gohub"
 
 	// redis
-	RedisDsn = "localhost:16379"
+	RedisAddr = "localhost:16379"
 
 	// jwt
 	ed25519PrivateKeyPath   = "pem/private.pem"

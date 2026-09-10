@@ -39,7 +39,7 @@ func main() {
 
 	// redis
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: internal.RedisDsn,
+		Addr: internal.RedisAddr,
 	})
 
 	// ratelimit
