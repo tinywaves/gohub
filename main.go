@@ -12,6 +12,7 @@ import (
 
 	"github.com/tinywaves/gohub/internal"
 	"github.com/tinywaves/gohub/internal/repository"
+	"github.com/tinywaves/gohub/internal/repository/cache"
 	"github.com/tinywaves/gohub/internal/repository/dao"
 	"github.com/tinywaves/gohub/internal/service"
 	"github.com/tinywaves/gohub/internal/web"
@@ -33,6 +34,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+	sqlDB.SetMaxOpenConns(internal.MysqlMaxOpenConns)
+	sqlDB.SetMaxIdleConns(internal.MysqlMaxIdleConns)
+	sqlDB.SetConnMaxLifetime(internal.MysqlConnMaxLifetime)
 	if err = dao.InitTables(db); err != nil {
 		panic(err)
 	}
@@ -46,7 +54,7 @@ func main() {
 	server.Use(
 		ratelimit.
 			InitRatelimitMiddlewareBuilder(
-				internal.RateLimitPrefix,
+				"ratelimit-client-ip",
 				redisClient,
 				internal.RateLimitInterval,
 				internal.RateLimitRate,
@@ -83,12 +91,13 @@ func main() {
 	v1 := api.Group("/v1")
 
 	userDAO := dao.InitUserDAO(db)
-	userRepository := repository.InitUserRepository(userDAO)
+	userCache := cache.InitUserCache(redisClient, internal.UserCacheExpiration)
+	userRepository := repository.InitUserRepository(userDAO, userCache)
 	userService := service.InitUserService(userRepository)
 	userHandler := web.InitUserHandler(userService)
 	userHandler.RegisterRoutes(v1.Group("/user"))
 
 	if err := server.Run(":11111"); err != nil {
-		panic("something error")
+		panic("gin server run error")
 	}
 }

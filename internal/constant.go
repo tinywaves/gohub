@@ -6,7 +6,4 @@ const (
 
 	// ctx
 	CtxUserKey = "userId"
-
-	// ratelimit
-	RateLimitPrefix = "ratelimit-client-ip"
 )

@@ -8,7 +8,10 @@ const (
 	CorsMaxAge   = 5 * time.Minute
 
 	// mysql
-	MysqlDsn = "root:root@tcp(localhost:13306)/gohub"
+	MysqlDsn             = "root:root@tcp(localhost:13306)/gohub"
+	MysqlMaxOpenConns    = 30
+	MysqlMaxIdleConns    = 10
+	MysqlConnMaxLifetime = time.Hour
 
 	// redis
 	RedisAddr = "localhost:16379"
@@ -22,4 +25,7 @@ const (
 	// ratelimit
 	RateLimitInterval = time.Second
 	RateLimitRate     = 1000
+
+	// cache
+	UserCacheExpiration = time.Minute * 15
 )
